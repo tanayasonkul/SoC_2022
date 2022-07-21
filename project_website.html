@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Data Encryption in Python</title>
+
+  <style>
+    body {background-image: url("https://imgkub.com/images/2022/07/15/encryp.jpg");
+    }
+    form {  position: relative;
+      border-radius: 25px;
+      border: solid 3px;
+      border-color: #20B2AA;
+      background: #F5F5DC;
+      width: 600px;
+      height: 395px;
+
+    }
+    .textarea2 {position: absolute;
+      margin-top: 35px;
+      margin-left: -250px;
+      width: 500px;
+      height: 85px;
+      border-radius: 15px;
+      border-color: DarkKhaki;
+      font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+      font-size: 16px;
+    }
+    .textarea1 {
+      width: 500px;
+      height: 45px;
+      border-width: 10px;
+      margin-top: 30px;
+      border-radius: 15px;
+      border-color: DarkKhaki;
+      font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+      font-size: 16px;
+    }
+    .box {
+      position: absolute;
+      margin-top: 210px;
+      margin-left: 460px;
+    }
+    .button {
+      margin-top: 19px;
+      margin-left: 250px;
+      cursor: pointer;
+    }
+    .head1 { position: absolute;
+      width: 1534px;
+      height: 100px;
+      margin-top: -10px;
+      margin-left: -7px;
+      margin-right: 0px;
+      background-image: url("https://imgkub.com/images/2022/07/15/image1.jpg");
+  }
+
+    .head2 {
+      position: absolute;
+      margin-top: -5px;
+      margin-left: 371px;
+      color: white;
+      -webkit-text-stroke: 0.5px black;
+      font-size: 25px;
+      color: grey;
+    }
+
+    .button {
+        position: absolute;
+        margin-left: -44px;
+        border-radius: 15px;
+        background: #E0E0E0;
+        border-color: Teal;
+        border-width: 3px;
+
+    }
+    p {
+      font-family: Helvetica, sans-serif;
+      color: DarkSlateGray;
+      font-size: 25px;
+      font-weight: 50;
+    }
+    label {position: absolute;
+      margin-left: -240px;
+      margin-top: 15px;
+      color: rgb(23, 50, 50)
+    }
+
+  </style>
+
+  </head>
+
+  <body>
+    <div class="head1">
+      <div class="head2">
+        <h1>DATA ENCRYPTION PROJECT</h1>
+      </div>
+    </div>
+    <center>
+      <div class="box">
+        <form action="/url" method="GET">
+          <p>Encryption key generator</p>
+          <input type="text" class="textarea1" placeholder="Enter the text to encrypt"><br><br><br>
+          <button id="execute"class="button">ENCRYPT</button><br><br><br>
+          <label for="crypted">Encrypted text:</label>
+          <textarea id="crypted"class="textarea2" name="crypted" rows="4"></textarea>
+          <button onclick="function()"></button>
+        </form>
+      </div>
+    </center>
+  </body>
+  <script type="text/javascript">
+    $(function () {
+  
+      //Change the key size value for new keys
+      $(".change-key-size").each(function (index, value) {
+        var el = $(value);
+        var keySize = el.attr('data-value');
+        el.click(function (e) {
+          var button = $('#key-size');
+          button.attr('data-value', keySize);
+          button.html(keySize + ' bit <span class="caret"></span>');
+          e.preventDefault();
+        });
+      });
+  
+      // Execute when they click the button.
+      $('#execute').click(function () {
+  
+        // Create the encryption object.
+        var crypt = new JSEncrypt();
+  
+        // Set the private.
+        crypt.setPrivateKey($('#privkey').val());
+        //return;
+        // If no public key is set then set it here...
+        var pubkey = $('#pubkey').val();
+        if (!pubkey) {
+          $('#pubkey').val(crypt.getPublicKey());
+        }
+  
+        // Get the input and crypted values.
+        var input = $('#input').val();
+        var crypted = $('#crypted').val();
+  
+        // Alternate the values.
+        if (input) {
+          $('#crypted').val(crypt.encrypt(input));
+          $('#input').val('');
+        }
+        else if (crypted) {
+          var decrypted = crypt.decrypt(crypted);
+          if (!decrypted)
+            decrypted = 'This is a test!';
+          $('#input').val(decrypted);
+          $('#crypted').val('');
+        }
+      });
+  
+      var generateKeys = function () {
+        var sKeySize = $('#key-size').attr('data-value');
+        var keySize = parseInt(sKeySize);
+        var crypt = new JSEncrypt({default_key_size: keySize});
+        var async = $('#async-ck').is(':checked');
+        var dt = new Date();
+        var time = -(dt.getTime());
+        if (async) {
+          $('#time-report').text('.');
+          var load = setInterval(function () {
+            var text = $('#time-report').text();
+            $('#time-report').text(text + '.');
+          }, 500);
+          crypt.getKey(function () {
+            clearInterval(load);
+            dt = new Date();
+            time += (dt.getTime());
+            $('#time-report').text('Generated in ' + time + ' ms');
+            $('#privkey').val(crypt.getPrivateKey());
+            $('#pubkey').val(crypt.getPublicKey());
+          });
+          return;
+        }
+        crypt.getKey();
+        dt = new Date();
+        time += (dt.getTime());
+        $('#time-report').text('Generated in ' + time + ' ms');
+        $('#privkey').val(crypt.getPrivateKey());
+        $('#pubkey').val(crypt.getPublicKey());
+      };
+  
+      // If they wish to generate new keys.
+      $('#generate').click(generateKeys);
+      generateKeys();
+    });
+  </script>
+</html>
